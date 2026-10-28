@@ -23,388 +23,900 @@ QueueLess solves this by providing:
 
 ---
 
-## Features
+# QueueLess — Complete Documentation
 
-### ✅ Implemented (Phase 0–1): Homepage & Static Pages
-
-- [x] Project scaffolding with Next.js 16, TypeScript (strict), Tailwind CSS 4
-- [x] shadcn/ui component library with Lucide React icons
-- [x] Custom indigo/blue design system with light/dark mode support
-- [x] Premium responsive homepage with 8 sections
-- [x] Responsive navigation with mobile sheet menu
-- [x] Hero section with search bar and popular searches
-- [x] Category grid (6 categories) with hover animations
-- [x] Featured business cards with ratings, queue info, verified badges
-- [x] How It Works — 3-step explainer
-- [x] Live Queue Preview (labelled demo)
-- [x] Why Choose QueueLess — benefits grid
-- [x] Business Owner CTA with commission disclosure
-- [x] FAQ accordion with accurate policy content
-- [x] Footer with all legal and navigation links
-- [x] Category detail pages (dynamic routes)
-- [x] About, Contact, Privacy, Terms, Refund Policy, Business Terms pages
-- [x] Custom 404 and error pages
-- [x] SEO metadata on all pages
-- [x] Accessible semantic HTML
-- [x] Reduced-motion support
-- [x] Demo data clearly labelled as non-production
-
-### ✅ Implemented (Phase 2): Database
-
-- [x] PostgreSQL + Prisma 7 schema with 14 models and 8 enums
-- [x] Full entity relationships (User, Business, Service, Appointment, QueueTicket, etc.)
-- [x] Database seed with categories, demo users, businesses, services, hours, commission policy
-- [x] Integer minor currency units (paise) for all money fields
-- [x] Composite indexes for query performance
-
-### ✅ Implemented (Phase 3): Authentication
-
-- [x] Login form with email/password and session cookies
-- [x] Registration form with Customer/Business Owner role selection
-- [x] Server-side session management with 30-day expiry
-- [x] Auth-aware header with user menu dropdown
-- [x] Route protection middleware for /customer, /owner, /admin paths
-- [x] Role-based redirects and server-side auth helpers
-- [x] Logout with session cookie cleanup
-
-### ✅ Implemented (Phase 4): Business Listings & Search
-
-- [x] Explore page with full-text search, category/city filters, and sorting
-- [x] Business card components with verified badges, ratings, queue info
-- [x] Pagination component with URL-synced state
-- [x] Business detail page with services, hours, reviews sidebar
-- [x] Category detail pages with filtered business listings
-- [x] Business registration form for owners (onboarding)
-- [x] Breadcrumb navigation throughout
-- [x] Graceful fallback to demo data when DB is unavailable
-
-### ✅ Implemented (Phase 5): Booking & Queue Engine
-
-- [x] Appointment booking service with conflict detection and business hours validation
-- [x] Available time slots calculation with 15-minute intervals
-- [x] Walk-in queue engine with atomic token allocation (prevents duplicates)
-- [x] Queue status tracking (WAITING → CALLED → SERVING → COMPLETED)
-- [x] Estimated wait time calculation
-- [x] Customer bookings page with status badges and booking details
-- [x] Customer queue page with token display and "called" alerts
-- [x] Server actions for join queue, call next, start serving, complete ticket
-
-### ✅ Implemented (Phase 6): Notifications
-
-- [x] Notification service (create, fetch, mark as read)
-- [x] Customer notifications page with type-specific icons
-- [x] Unread count and read indicators
-- [x] Notification types: queue update, appointment reminder, booking confirmation/cancellation, system
-
-### ✅ Implemented (Phase 7): Commission & Payments
-
-- [x] Commission calculation with integer arithmetic (no floating-point errors)
-- [x] Min/max commission bounds
-- [x] Booking payment creation with commission snapshot
-- [x] Payment webhook endpoint (Razorpay/Stripe) with idempotency
-- [x] Commission ledger entries (never modifies existing records)
-- [x] Refund processing with negative ledger adjustment entries
-- [x] Payment server actions for appointments and queue tickets
-- [x] Commission summary for admin dashboard
-
-### ✅ Implemented (Phase 8): Dashboards
-
-- [x] Customer dashboard with sidebar (Bookings, Queue, Notifications)
-- [x] Owner dashboard with stats overview (businesses, appointments, queue, reviews)
-- [x] Owner businesses list with verification status and management links
-- [x] Individual business management: today's queue, appointments, services
-- [x] Owner earnings page with revenue breakdown and payment history table
-- [x] Admin dashboard with platform-wide stats and commission revenue
-- [x] Admin business verification page (pending/approved/rejected)
-- [x] Admin commission policy management
-- [x] Admin review moderation page
-- [x] Admin audit log viewer with action trail
-
-### ✅ Implemented (Phase 9): Testing, Security & Deployment
-
-- [x] Vitest unit test suite with mocked Prisma
-- [x] Commission calculation tests (core business logic)
-- [x] Validation schema tests (all Zod schemas)
-- [x] Booking, queue, payment, and review service tests
-- [x] Rate limiter with sliding-window counter
-- [x] Rate limiter unit tests
-- [x] Playwright E2E test configuration (Chromium, Firefox, WebKit, Mobile)
-- [x] Homepage, auth, and explore page E2E tests
-- [x] Security headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, etc.)
-- [x] Rate limiting middleware on auth endpoints (brute-force protection)
-- [x] Powered-by header removed (framework fingerprint)
-- [x] Health check API endpoint (`/api/health`) with DB connectivity check
-- [x] Multi-stage Dockerfile with non-root user and health check
-- [x] `.dockerignore` for minimal image size
-- [x] Standalone output mode for containerized deployments
+> **Find your service. Book your spot. Skip the wait.**
 
 ---
 
-## Screenshots
+## Table of Contents
 
-> Screenshots will be added as implementation progresses.
-
----
-
-## Tech Stack
-
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| Framework | Next.js (App Router) | 16.4 |
-| Language | TypeScript (strict mode) | 5.x |
-| UI Library | React | 19.3 |
-| Styling | Tailwind CSS | 4.x |
-| Components | shadcn/ui | Latest |
-| Icons | Lucide React | Latest |
-| Database | PostgreSQL | 16+ (Phase 2) |
-| ORM | Prisma | 7.x (Phase 2) |
-| Auth | Better Auth | (Phase 3) |
-| Validation | Zod | (Phase 3) |
-| Forms | React Hook Form | (Phase 4) |
-| Realtime | Supabase Realtime | (Phase 6) |
-| Email | Resend | (Phase 6) |
-| Payments | Razorpay/Stripe | (Phase 7) |
-| Unit Tests | Vitest | (Phase 9) |
-| E2E Tests | Playwright | (Phase 9) |
-| Runtime | Node.js | 24.x |
-| Package Manager | npm | 11.x |
+1. [Overview](#overview)
+2. [Demo Login Credentials](#demo-login-credentials)
+3. [Quick Start Guide](#quick-start-guide)
+4. [Architecture](#architecture)
+5. [Project Structure](#project-structure)
+6. [Database Schema](#database-schema)
+7. [Authentication System](#authentication-system)
+8. [API Reference](#api-reference)
+9. [Server Actions](#server-actions)
+10. [Service Layer](#service-layer)
+11. [Commission & Payments](#commission--payments)
+12. [Queue System](#queue-system)
+13. [Role-Based Access Control](#role-based-access-control)
+14. [Security](#security)
+15. [Testing](#testing)
+16. [Deployment](#deployment)
+17. [Environment Variables](#environment-variables)
+18. [Troubleshooting](#troubleshooting)
 
 ---
 
-## Architecture Overview
+## Overview
 
-```mermaid
-graph TB
-    subgraph "Client Browser"
-        A[Next.js RSC + Client Components]
-        B[Supabase Realtime Client]
-    end
-    
-    subgraph "Next.js Server"
-        C[Server Components]
-        D[Server Actions]
-        E[API Routes - Webhooks]
-        F[Auth Middleware]
-        G[Service Layer]
-    end
-    
-    subgraph "Data & External Services"
-        H[(PostgreSQL)]
-        I[Prisma ORM]
-        J[Supabase Realtime]
-        K[Resend Email]
-        L[Payment Gateway]
-    end
-    
-    A --> C
-    A --> D
-    B --> J
-    C --> F
-    D --> F
-    F --> G
-    G --> I
-    I --> H
-    E --> G
-    G --> K
-    G --> L
-    J --> H
-```
+QueueLess is a commission-based local services marketplace with a real-time virtual queue and appointment-booking system built with:
+
+| Layer          | Technology                |
+| -------------- | ------------------------- |
+| Framework      | Next.js 16 (App Router)   |
+| Language       | TypeScript (strict mode)  |
+| UI             | React 19.3                |
+| Styling        | Tailwind CSS 4            |
+| Components     | shadcn/ui + Lucide Icons  |
+| Database       | PostgreSQL 16+            |
+| ORM            | Prisma 7                  |
+| Validation     | Zod 4                     |
+| Unit Tests     | Vitest 5                  |
+| E2E Tests      | Playwright                |
+| Container      | Docker (multi-stage)      |
 
 ---
 
-## Entity Relationship Diagram (Planned)
+## Demo Login Credentials
 
-```mermaid
-erDiagram
-    User ||--o{ BusinessMembership : has
-    User ||--o{ Appointment : books
-    User ||--o{ QueueTicket : holds
-    User ||--o{ Review : writes
-    User ||--o{ Notification : receives
-    
-    Business ||--o{ BusinessMembership : has
-    Business ||--o{ Service : offers
-    Business ||--o{ BusinessHours : has
-    Business }o--|| Category : belongs_to
-    Business ||--o{ QueueCounter : has
-    Business ||--o{ Review : receives
-    
-    Service ||--o{ Appointment : for
-    Service ||--o{ QueueTicket : for
-    
-    Appointment ||--o| BookingPayment : has
-    QueueTicket ||--o| BookingPayment : has
-    
-    BookingPayment ||--o{ CommissionLedgerEntry : generates
-    CommissionPolicy ||--o{ BookingPayment : snapshot
-```
+After running the database seed (`npm run db:seed`), the following demo accounts are available:
+
+### Admin Account
+
+| Field    | Value                              |
+| -------- | ---------------------------------- |
+| Email    | `admin@queueless.example.com`      |
+| Password | `admin123`                         |
+| Role     | `ADMIN`                            |
+| Name     | QueueLess Admin                    |
+| URL      | http://localhost:3000/login then redirects to `/admin` |
+
+**What you can do as Admin:**
+- View platform-wide stats (total users, businesses, appointments, queue tickets, payments)
+- View total platform commission revenue
+- Verify/reject businesses (Admin > Businesses)
+- Configure commission policies (Admin > Commission)
+- Moderate user reviews (Admin > Reviews)
+- View audit logs of all privileged actions (Admin > Audit Log)
+- Process refunds
 
 ---
 
-## Prerequisites
+### Shop Owner Account
 
-- **Node.js** >= 20.x (tested with 24.17.0)
+| Field    | Value                              |
+| -------- | ---------------------------------- |
+| Email    | `owner@queueless.example.com`      |
+| Password | `owner123`                         |
+| Role     | `SHOP_OWNER`                       |
+| Name     | Dr. Priya Sharma                   |
+| Phone    | +919876543210                      |
+| URL      | http://localhost:3000/login then redirects to `/owner` |
+
+**What you can do as Owner:**
+- View dashboard with stats (businesses, appointments, queue tickets, reviews)
+- Manage registered businesses (Sunrise Health Clinic, Elite Cuts Salon)
+- Register new businesses
+- Manage queue (call next, start serving, complete ticket)
+- View earnings and payment history
+- Update business details, services, and hours
+
+**Pre-seeded Businesses:**
+
+| Business             | Category    | City      | Services                                    |
+| -------------------- | ----------- | --------- | -------------------------------------------- |
+| Sunrise Health Clinic | Healthcare  | Bangalore | General Consultation (Rs.500), Pediatric (Rs.800) |
+| Elite Cuts Salon     | Salon & Spa | Bangalore | Haircut - Men (Rs.400), Hair Coloring (Rs.2,500) |
+
+---
+
+### Customer Account
+
+| Field    | Value                              |
+| -------- | ---------------------------------- |
+| Email    | `customer@queueless.example.com`   |
+| Password | `customer123`                      |
+| Role     | `CUSTOMER`                         |
+| Name     | Rahul Patel                        |
+| Phone    | +919123456789                      |
+| URL      | http://localhost:3000/login then redirects to `/customer/bookings` |
+
+**What you can do as Customer:**
+- Browse and search businesses (Explore page)
+- View business details, services, hours, and reviews
+- Book appointments with specific time slots
+- Join walk-in queues and get digital tokens
+- Track queue position in real time
+- View all bookings and queue tickets
+- Submit reviews for completed bookings
+- View notifications
+
+---
+
+## Quick Start Guide
+
+### Prerequisites
+
+- **Node.js** >= 20.x
 - **npm** >= 10.x
-- **PostgreSQL** >= 16 (required from Phase 2)
+- **PostgreSQL** >= 16 (or a Neon/Supabase managed instance)
 
----
-
-## Installation
+### Installation
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone <repository-url>
 cd queueless
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Copy environment variables
+# 3. Copy environment variables
 cp .env.example .env.local
-# Edit .env.local with your values
+# Edit .env.local with your DATABASE_URL
 
-# Start the development server
+# 4. Generate Prisma client
+npm run db:generate
+
+# 5. Push schema to database (or run migrations)
+npm run db:push
+# OR for tracked migrations:
+npm run db:migrate
+
+# 6. Seed the database with demo data
+npm run db:seed
+
+# 7. Start the development server
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000)
+Visit http://localhost:3000
+
+### Login Flow
+
+1. Go to http://localhost:3000/login
+2. Enter any demo email/password from the table above
+3. You will be redirected to the appropriate dashboard based on your role
+
+### Available npm Scripts
+
+| Script               | Command                | Description                          |
+| -------------------- | ---------------------- | ------------------------------------ |
+| `dev`                | `npm run dev`          | Start development server             |
+| `build`              | `npm run build`        | Production build                     |
+| `start`              | `npm run start`        | Start production server              |
+| `lint`               | `npm run lint`         | Run ESLint                           |
+| `test`               | `npm run test`         | Run unit tests (Vitest)              |
+| `test:watch`         | `npm run test:watch`   | Run tests in watch mode              |
+| `test:coverage`      | `npm run test:coverage`| Run tests with coverage              |
+| `test:e2e`           | `npm run test:e2e`     | Run E2E tests (Playwright)           |
+| `test:e2e:ui`        | `npm run test:e2e:ui`  | E2E tests with Playwright UI         |
+| `test:e2e:install`   | `npm run test:e2e:install` | Install Playwright browsers      |
+| `db:generate`        | `npm run db:generate`  | Generate Prisma client               |
+| `db:migrate`         | `npm run db:migrate`   | Run Prisma migrations                |
+| `db:push`            | `npm run db:push`      | Push schema to DB (no migration)     |
+| `db:seed`            | `npm run db:seed`      | Seed database with demo data         |
+| `db:studio`          | `npm run db:studio`    | Open Prisma Studio (DB GUI)          |
+
+---
+
+## Architecture
+
+### High-Level Architecture
+
+```
++-------------------------------------------------------------+
+|                     Client Browser                           |
+|  +------------------------------------------------------+   |
+|  |  Next.js React Components (RSC + Client Components)  |   |
+|  +------------------------------------------------------+   |
++-------------------------------------------------------------+
+                  |                      |
+                  v                      v
++-------------------------------------------------------------+
+|                    Next.js Server                            |
+|  +------------+  +------------+  +----------------------+   |
+|  |   Server   |  |   Server   |  |    API Routes        |   |
+|  | Components |  |  Actions   |  |  (Webhooks, Health)  |   |
+|  +------+-----+  +------+-----+  +----------+-----------+   |
+|         |               |                    |               |
+|         v               v                    v               |
+|  +------------------------------------------------------+   |
+|  |               Auth Middleware (Proxy)                  |   |
+|  +------------------------------------------------------+   |
+|                         |                                    |
+|  +------------------------------------------------------+   |
+|  |              Service Layer (Business Logic)           |   |
+|  |  auth - business - booking - queue - payment - review |   |
+|  |  notification - audit                                 |   |
+|  +------------------------------------------------------+   |
++-------------------------------------------------------------+
+                          |
+                          v
+              +-----------------------+
+              |   Prisma ORM Client   |
+              +-----------+-----------+
+                          |
+                          v
+              +-----------------------+
+              |     PostgreSQL DB     |
+              +-----------------------+
+```
+
+### Request Flow
+
+1. **Browser** sends request to Next.js server
+2. **Middleware** checks for session cookie on protected routes (`/customer/*`, `/owner/*`, `/admin/*`)
+3. **Server Components** call service layer directly; **Client Components** call Server Actions
+4. **Service Layer** performs business logic and database operations via Prisma
+5. **Response** returned to browser (RSC payload or JSON for actions)
+
+### Key Design Decisions
+
+- **Server Components by default** - client components only when interactivity is needed (forms, menus)
+- **Server Actions** - all mutations go through `"use server"` actions with Zod validation
+- **Service Layer** - business logic separated from actions/routes for testability
+- **Integer currency** - all money stored in paise (minor currency units) to avoid floating-point errors
+- **Immutable financial records** - commission snapshots and ledger entries are never retroactively modified
+
+---
+
+## Project Structure
+
+```
+queueless/
+├── prisma/
+│   ├── schema.prisma          # Database schema (17 models, 8 enums)
+│   └── seed.ts                # Demo data seeder
+├── src/
+│   ├── app/                   # Next.js App Router pages
+│   │   ├── layout.tsx         # Root layout with Inter font
+│   │   ├── page.tsx           # Homepage with 8 marketing sections
+│   │   ├── globals.css        # Tailwind + design tokens (indigo theme)
+│   │   ├── login/page.tsx     # Login page
+│   │   ├── register/page.tsx  # Registration page
+│   │   ├── admin/             # Admin dashboard (layout + 4 sub-pages)
+│   │   │   ├── layout.tsx     # Admin sidebar + role guard
+│   │   │   ├── page.tsx       # Platform stats overview
+│   │   │   ├── businesses/    # Business verification
+│   │   │   ├── commission/    # Commission policy management
+│   │   │   ├── reviews/       # Review moderation
+│   │   │   └── audit/         # Audit log viewer
+│   │   ├── owner/             # Shop owner dashboard
+│   │   │   ├── layout.tsx     # Owner sidebar + role guard
+│   │   │   ├── page.tsx       # Owner stats + business list
+│   │   │   ├── businesses/    # Individual business management
+│   │   │   ├── earnings/      # Revenue & payment history
+│   │   │   └── register-business/ # New business onboarding
+│   │   ├── customer/          # Customer dashboard
+│   │   │   ├── layout.tsx     # Customer sidebar
+│   │   │   ├── bookings/      # Appointment list
+│   │   │   ├── queue/         # Active queue tickets
+│   │   │   └── notifications/ # Notification inbox
+│   │   ├── explore/           # Business search & discovery
+│   │   ├── categories/        # Category detail pages
+│   │   ├── api/
+│   │   │   ├── health/        # GET /api/health
+│   │   │   └── webhooks/
+│   │   │       └── payment/   # POST /api/webhooks/payment
+│   │   └── (static pages)     # about, contact, privacy, terms, etc.
+│   ├── components/
+│   │   ├── auth/              # LoginForm, RegisterForm
+│   │   ├── explore/           # BusinessCard, SearchFilters, Pagination
+│   │   ├── layout/            # Header, Footer, UserMenu
+│   │   ├── marketing/         # Homepage sections (8 components)
+│   │   └── ui/                # shadcn/ui primitives
+│   ├── lib/
+│   │   ├── auth.ts            # getCurrentUser(), requireUser(), requireRole()
+│   │   ├── commission.ts      # calculateCommission(), formatCurrency()
+│   │   ├── constants.ts       # Categories, featured businesses, FAQ data
+│   │   ├── db.ts              # Prisma client singleton
+│   │   ├── rate-limit.ts      # Sliding-window rate limiter
+│   │   ├── utils.ts           # cn() utility (class merge)
+│   │   └── validations.ts     # All Zod schemas & types
+│   ├── middleware.ts           # Route protection + rate limiting
+│   └── server/
+│       ├── actions/            # "use server" action handlers
+│       │   ├── auth.actions.ts
+│       │   ├── admin.actions.ts
+│       │   ├── booking.actions.ts
+│       │   ├── business.actions.ts
+│       │   ├── notification.actions.ts
+│       │   ├── payment.actions.ts
+│       │   └── review.actions.ts
+│       └── services/           # Business logic layer
+│           ├── auth.service.ts
+│           ├── audit.service.ts
+│           ├── booking.service.ts
+│           ├── business.service.ts
+│           ├── notification.service.ts
+│           ├── payment.service.ts
+│           ├── queue.service.ts
+│           ├── review.service.ts
+│           └── index.ts
+├── e2e/                        # Playwright E2E tests
+├── docs/                       # Additional documentation
+├── public/                     # Static assets
+├── Dockerfile                  # Multi-stage Docker build
+├── next.config.ts              # Next.js configuration
+├── package.json
+└── tsconfig.json
+```
+
+---
+
+## Database Schema
+
+### Models Summary
+
+| Model                    | Table Name                | Key Fields                                           |
+| ------------------------ | ------------------------- | ---------------------------------------------------- |
+| `User`                   | `users`                   | email, role (CUSTOMER/SHOP_OWNER/ADMIN)              |
+| `Session`                | `sessions`                | userId, token, expiresAt                             |
+| `Category`               | `categories`              | slug, name, icon (Lucide icon name)                  |
+| `Business`               | `businesses`              | slug, categoryId, verificationStatus                 |
+| `BusinessMembership`     | `business_memberships`    | userId, businessId, role (OWNER/MANAGER/STAFF)       |
+| `Service`                | `services`                | businessId, durationMinutes, priceAmount (paise)     |
+| `BusinessHours`          | `business_hours`          | businessId, dayOfWeek, openTime, closeTime           |
+| `Appointment`            | `appointments`            | businessId, serviceId, customerId, date, startTime   |
+| `QueueCounter`           | `queue_counters`          | businessId, date, lastTokenNumber                    |
+| `QueueTicket`            | `queue_tickets`           | tokenNumber, status, estimatedWaitMinutes            |
+| `BookingPayment`         | `booking_payments`        | grossAmountPaise, commissionAmountPaise               |
+| `CommissionPolicy`       | `commission_policies`     | ratePercent, minAmountPaise, maxAmountPaise           |
+| `CommissionLedgerEntry`  | `commission_ledger_entries`| bookingPaymentId, type (COMMISSION/REFUND_ADJUSTMENT) |
+| `Review`                 | `reviews`                 | businessId, customerId, rating (1-5)                 |
+| `Notification`           | `notifications`           | userId, type, title, body, isRead                    |
+| `AuditLog`               | `audit_logs`              | userId, action, entityType, entityId                 |
+| `WebhookEvent`           | `webhook_events`          | provider, eventId (unique), processedAt              |
+
+### Enums
+
+| Enum                 | Values                                            |
+| -------------------- | ------------------------------------------------- |
+| `UserRole`           | CUSTOMER, SHOP_OWNER, ADMIN                       |
+| `VerificationStatus` | PENDING, APPROVED, REJECTED                       |
+| `MembershipRole`     | OWNER, MANAGER, STAFF                             |
+| `AppointmentStatus`  | CONFIRMED, COMPLETED, CANCELLED, NO_SHOW          |
+| `QueueTicketStatus`  | WAITING, CALLED, SERVING, COMPLETED, CANCELLED, NO_SHOW |
+| `PaymentStatus`      | PENDING, CAPTURED, REFUNDED, FAILED               |
+| `LedgerEntryType`    | COMMISSION, REFUND_ADJUSTMENT                     |
+| `NotificationType`   | QUEUE_UPDATE, APPOINTMENT_REMINDER, BOOKING_CONFIRMATION, BOOKING_CANCELLATION, SYSTEM |
+
+---
+
+## Authentication System
+
+### How It Works
+
+1. **Registration**: User submits email/password/name via `RegisterForm` -> `registerAction` -> `registerUser` service
+2. **Password Hashing**: SHA-256 with a salt (`password + "queueless_salt"`)
+3. **Login**: Email/password verified -> Session created (30-day expiry) -> `session_token` cookie set
+4. **Session Check**: `getCurrentUser()` reads cookie -> looks up session in DB -> returns user
+5. **Logout**: Session deleted from DB -> cookie removed -> redirect to home
+
+### Auth Helper Functions (src/lib/auth.ts)
+
+| Function         | Returns              | Description                           |
+| ---------------- | -------------------- | ------------------------------------- |
+| `getCurrentUser()` | `SessionUser or null` | Get current user from session cookie  |
+| `requireUser()`   | `SessionUser`        | Like above but redirects to `/login` if not authenticated |
+| `requireRole(...roles)` | `SessionUser`  | Requires specific role(s) or redirects to `/` |
+
+### Session Cookie Configuration
+
+| Property   | Value                              |
+| ---------- | ---------------------------------- |
+| Name       | `session_token`                    |
+| HttpOnly   | `true`                             |
+| Secure     | `true` in production               |
+| SameSite   | `lax`                              |
+| Expires    | 30 days from login                 |
+| Path       | `/`                                |
+
+---
+
+## API Reference
+
+### GET /api/health
+
+Health check endpoint for load balancers and monitoring.
+
+**Response (200)**:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2026-10-26T08:00:00.000Z",
+  "uptime": 12345.678,
+  "version": "0.1.0",
+  "environment": "development",
+  "database": "connected",
+  "responseTimeMs": 15
+}
+```
+
+### POST /api/webhooks/payment
+
+Payment webhook endpoint (Razorpay/Stripe). Processes payment events idempotently.
+
+**Headers**:
+- `x-provider`: `"razorpay"` or `"stripe"` (default: `"razorpay"`)
+
+**Body (Razorpay)**:
+```json
+{
+  "event_id": "evt_123",
+  "event": "payment.captured",
+  "payload": {
+    "payment": {
+      "entity": {
+        "id": "pay_123",
+        "order_id": "order_123"
+      }
+    }
+  }
+}
+```
+
+**Response (200)**:
+```json
+{ "status": "captured" }
+```
+
+Possible status values: `captured`, `already_processed`, `payment_not_found`, `unhandled_event_type`, `error_recorded`
+
+---
+
+## Server Actions
+
+All server actions use the `"use server"` directive and follow the pattern:
+
+```typescript
+export async function actionName(formData: FormData): Promise<ActionResult> {
+  // 1. Authenticate user
+  // 2. Validate input with Zod
+  // 3. Call service layer
+  // 4. Return { success, error?, data? }
+}
+```
+
+### Auth Actions (auth.actions.ts)
+
+| Action             | Input                  | Description                    |
+| ------------------ | ---------------------- | ------------------------------ |
+| `registerAction`   | FormData (email, password, name, phone?, role) | Register new user |
+| `loginAction`      | FormData (email, password) | Login and set session cookie |
+| `logoutAction`     | None                   | Delete session and redirect    |
+
+### Booking Actions (booking.actions.ts)
+
+| Action                    | Input                           | Description                    |
+| ------------------------- | ------------------------------- | ------------------------------ |
+| `joinQueueAction`         | FormData (businessId, serviceId) | Join walk-in queue             |
+| `callNextAction`          | businessId                      | Call next person (staff only)  |
+| `startServingAction`      | ticketId                        | Start serving customer (staff) |
+| `completeTicketAction`    | ticketId                        | Mark ticket complete (staff)   |
+| `createAppointmentAction` | FormData (businessId, serviceId, date, startTime, notes?) | Book appointment |
+| `cancelAppointmentAction` | appointmentId                   | Cancel appointment             |
+
+### Business Actions (business.actions.ts)
+
+| Action                    | Input                           | Description                    |
+| ------------------------- | ------------------------------- | ------------------------------ |
+| `createBusinessAction`    | FormData (name, address, city, state, pincode, categoryId, ...) | Register new business |
+| `updateBusinessAction`    | (businessId, FormData)          | Update business details        |
+| `searchBusinessesAction`  | { q?, category?, city?, page?, limit?, sortBy? } | Search businesses |
+| `getBusinessBySlugAction` | slug                            | Get business by URL slug       |
+| `getOwnerBusinessesAction`| None                            | Get owner's businesses         |
+
+### Admin Actions (admin.actions.ts)
+
+| Action                          | Input                          | Description                    |
+| ------------------------------- | ------------------------------ | ------------------------------ |
+| `getBusinessesForVerificationAction` | None                      | List all businesses            |
+| `verifyBusinessAction`          | (businessId, status, note?)    | Approve/reject business        |
+| `getCommissionPoliciesAction`   | None                           | List commission policies       |
+| `createCommissionPolicyAction`  | FormData                       | Create new policy              |
+| `getAdminStatsAction`           | None                           | Get platform statistics        |
+| `getAuditLogsAction`            | limit?                         | Get audit log entries          |
+| `moderateReviewAction`          | (reviewId, moderated)          | Moderate a review              |
+
+### Payment Actions (payment.actions.ts)
+
+| Action                           | Input        | Description                    |
+| -------------------------------- | ------------ | ------------------------------ |
+| `createAppointmentPaymentAction` | appointmentId | Create payment for appointment |
+| `createQueuePaymentAction`       | queueTicketId | Create payment for queue ticket |
+| `processRefundAction`            | (paymentId, reason) | Process refund (admin)  |
+| `getCommissionSummaryAction`     | None         | Get commission summary (admin) |
+
+### Notification Actions (notification.actions.ts)
+
+| Action                  | Input          | Description                    |
+| ----------------------- | -------------- | ------------------------------ |
+| `getNotificationsAction`| None           | Get user's notifications       |
+| `markReadAction`        | notificationId | Mark single notification read  |
+| `markAllReadAction`     | None           | Mark all notifications read    |
+
+### Review Actions (review.actions.ts)
+
+| Action                      | Input                      | Description                    |
+| --------------------------- | -------------------------- | ------------------------------ |
+| `createReviewAction`        | FormData (businessId, bookingId, bookingType, rating, comment?) | Submit review |
+| `getBusinessReviewsAction`  | (businessId, limit?, offset?) | Get business reviews        |
+
+---
+
+## Service Layer
+
+All business logic lives in `src/server/services/`. Each service module exports pure functions that take validated input and return results or throw errors.
+
+### Auth Service (auth.service.ts)
+
+- `registerUser(input)` - Create user with hashed password
+- `loginUser(input)` - Verify credentials, create session, return token
+- `getSessionUser(token)` - Lookup session by token
+- `logoutUser(token)` - Delete session
+
+### Business Service (business.service.ts)
+
+- `createBusiness(ownerId, input)` - Create business + membership + default hours (in transaction)
+- `updateBusiness(businessId, userId, input)` - Update with membership verification
+- `getBusinessBySlug(slug)` - Full business details with services, hours, reviews
+- `searchBusinesses(input)` - Paginated search with filters
+- `getBusinessesForOwner(userId)` - Owner's businesses with stats
+
+### Booking Service (booking.service.ts)
+
+- `createAppointment(customerId, input)` - Book with conflict detection + business hours validation
+- `cancelAppointment(appointmentId, userId)` - Cancel with permission check
+- `getCustomerAppointments(customerId)` - List customer's appointments
+- `getBusinessAppointments(businessId, date)` - List business's daily appointments
+- `getAvailableSlots(businessId, serviceId, date)` - Calculate available 15-min slots
+
+### Queue Service (queue.service.ts)
+
+- `joinQueue(customerId, input)` - Atomic token allocation + estimated wait time
+- `getQueueStatus(businessId)` - Currently serving, waiting count, completed count
+- `callNextInQueue(businessId, staffUserId)` - Call next WAITING ticket
+- `startServing(ticketId, staffUserId)` - Move CALLED to SERVING
+- `completeTicket(ticketId, staffUserId)` - Move to COMPLETED
+- `getCustomerTickets(customerId)` - Active queue tickets
+
+### Payment Service (payment.service.ts)
+
+- `createBookingPayment(params)` - Calculate commission, create payment record
+- `processPaymentWebhook(params)` - Idempotent webhook processing
+- `processRefund(paymentId, reason)` - Create negative ledger entry
+- `getCommissionSummary()` - Aggregate ledger entries
+
+### Notification Service (notification.service.ts)
+
+- `createNotification(params)` - Create notification
+- `getUserNotifications(userId, limit?, offset?)` - Paginated with unread count
+- `markNotificationRead(notificationId, userId)` - Mark single read
+- `markAllNotificationsRead(userId)` - Mark all read
+
+### Review Service (review.service.ts)
+
+- `createReview(customerId, input)` - Verify booking ownership, check duplicates
+- `getBusinessReviews(businessId, limit?, offset?)` - With average rating stats
+- `moderateReview(reviewId, moderated)` - Toggle moderation flag
+
+### Audit Service (audit.service.ts)
+
+- `createAuditLog(params)` - Record privileged action
+- `getAuditLogs(params)` - Query audit logs with filters
+
+---
+
+## Commission & Payments
+
+### Commission Model
+
+| Item                    | Example             |
+| ----------------------- | ------------------- |
+| Service price           | Rs.1,000.00 (100000 paise) |
+| Commission rate         | 10% (configurable)  |
+| Platform commission     | Rs.100.00 (10000 paise)    |
+| Owner's share           | Rs.900.00 (90000 paise)    |
+| Gateway fees & taxes    | Deducted separately       |
+
+### Key Principles
+
+1. **Integer arithmetic** - All money in paise to avoid floating-point errors
+2. **Immutable snapshots** - Commission rate captured at booking time (never retroactively changed)
+3. **Append-only ledger** - Refunds create negative entries, never modify existing records
+4. **Min/max bounds** - Commission policies can set minimum and maximum amounts
+5. **Idempotent webhooks** - Payment events deduplicated by `eventId`
+
+### Payment Flow
+
+```
+1. Customer books appointment/queue -> createBookingPayment() called
+2. Payment record created with status PENDING + commission calculated
+3. Customer pays via Razorpay/Stripe (external)
+4. Webhook received -> processPaymentWebhook()
+5. Idempotency check (eventId) -> Update to CAPTURED + create ledger entry
+6. If refund needed -> processRefund() creates REFUND_ADJUSTMENT ledger entry
+```
+
+### Commission Calculation (src/lib/commission.ts)
+
+```typescript
+calculateCommission(grossAmountPaise, policy, currency)
+// Returns: { grossAmountPaise, commissionRatePercent, commissionAmountPaise, ownerSharePaise, currency }
+
+formatCurrency(paise, currency)
+// Returns: formatted string like "Rs.1,000.00"
+```
+
+---
+
+## Queue System
+
+### Token Allocation
+
+The queue system uses **atomic database operations** to prevent duplicate token numbers:
+
+```
+1. Customer calls joinQueue(businessId, serviceId)
+2. Transaction:
+   a. UPSERT QueueCounter -> increment lastTokenNumber
+   b. Count WAITING/CALLED/SERVING tickets -> estimate wait
+   c. CREATE QueueTicket with allocated token number
+3. Return ticket with token, position, estimated wait
+```
+
+### Queue State Machine
+
+```
+WAITING -> CALLED -> SERVING -> COMPLETED
+                       ^
+  (any state can also go to CANCELLED or NO_SHOW)
+```
+
+| State     | Triggered By          | Description                          |
+| --------- | --------------------- | ------------------------------------ |
+| WAITING   | `joinQueue()`         | Customer joined queue                |
+| CALLED    | `callNextInQueue()`   | Staff called customer's number       |
+| SERVING   | `startServing()`      | Customer at counter, service started |
+| COMPLETED | `completeTicket()`    | Service finished                     |
+| CANCELLED | Customer cancellation | Customer left queue                  |
+| NO_SHOW   | Staff action          | Customer didn't respond when called  |
+
+---
+
+## Role-Based Access Control
+
+### Permission Matrix
+
+| Action                        | Customer | Shop Owner | Admin |
+| ----------------------------- | -------- | ---------- | ----- |
+| Browse businesses             | Yes      | Yes        | Yes   |
+| Book appointments             | Yes      | No         | No    |
+| Join walk-in queue            | Yes      | No         | No    |
+| Submit reviews                | Yes      | No         | No    |
+| View own bookings and queue   | Yes      | No         | No    |
+| Create business listing       | No       | Yes        | Yes   |
+| Manage own business           | No       | Yes        | No    |
+| Manage queue (call/serve)     | No       | Yes        | No    |
+| View own earnings             | No       | Yes        | No    |
+| Verify businesses             | No       | No         | Yes   |
+| Moderate reviews              | No       | No         | Yes   |
+| Configure commission          | No       | No         | Yes   |
+| View audit logs               | No       | No         | Yes   |
+| Process refunds               | No       | No         | Yes   |
+
+### Route Protection
+
+| Route Pattern    | Required Role         | Enforced By                     |
+| ---------------- | --------------------- | ------------------------------- |
+| `/customer/*`    | Any authenticated     | Middleware + layout             |
+| `/owner/*`       | SHOP_OWNER or ADMIN   | Middleware + layout             |
+| `/admin/*`       | ADMIN only            | Middleware + layout             |
+| `/login`         | Unauthenticated only  | Page-level redirect             |
+| `/register`      | Unauthenticated only  | Page-level redirect             |
+
+---
+
+## Security
+
+### Headers (configured in next.config.ts)
+
+| Header                    | Value                              |
+| ------------------------- | ---------------------------------- |
+| Strict-Transport-Security | max-age=63072000; includeSubDomains; preload |
+| X-Frame-Options           | SAMEORIGIN                         |
+| X-Content-Type-Options    | nosniff                            |
+| X-XSS-Protection          | 1; mode=block                      |
+| Referrer-Policy            | strict-origin-when-cross-origin    |
+| Content-Security-Policy   | default-src 'self'; script-src 'self' ... |
+| Permissions-Policy         | camera=(), microphone=(), geolocation=(self) |
+| X-DNS-Prefetch-Control    | on                                 |
+
+### Rate Limiting
+
+| Endpoint          | Limit                  | Implementation          |
+| ----------------- | ---------------------- | ----------------------- |
+| `/login` POST     | 10 req / 15 min per IP | Middleware (edge)       |
+| `/register` POST  | 10 req / 15 min per IP | Middleware (edge)       |
+| Auth operations   | 10 req / 15 min        | Server-side rate limiter |
+| Booking operations| 20 req / min           | Server-side rate limiter |
+| API general       | 100 req / min          | Server-side rate limiter |
+| Webhooks          | 50 req / min           | Server-side rate limiter |
+
+### Additional Security Measures
+
+- HttpOnly session cookies (not accessible via JavaScript)
+- Zod validation on all inputs (server-side)
+- SQL injection prevention via Prisma parameterized queries
+- No raw card details stored (handled by payment gateway)
+- Audit logging for all privileged actions
+- `poweredByHeader: false` (hides Next.js framework fingerprint)
+- Error responses don't leak stack traces or secrets
+- Webhook idempotency prevents duplicate payment processing
+
+---
+
+## Testing
+
+### Unit Tests (Vitest)
+
+```bash
+npm run test              # Run all unit tests
+npm run test:watch        # Watch mode
+npm run test:coverage     # With coverage report
+```
+
+Test files are located in:
+- `src/lib/__tests__/` - Commission, validations, rate limiter
+- `src/server/services/__tests__/` - Booking, queue, payment, review services
+
+### E2E Tests (Playwright)
+
+```bash
+npm run test:e2e:install  # Install browsers (first time)
+npm run test:e2e          # Run E2E tests
+npm run test:e2e:ui       # Run with Playwright UI
+```
+
+Test files: `e2e/` directory. Covers:
+- Homepage rendering and navigation
+- Auth flows (login, register)
+- Explore/search page
+- Cross-browser testing (Chromium, Firefox, WebKit, Mobile)
+
+---
+
+## Deployment
+
+### Docker
+
+```bash
+# Build the image
+docker build -t queueless .
+
+# Run the container
+docker run -p 3000:3000 \
+  -e DATABASE_URL="postgresql://..." \
+  -e BETTER_AUTH_SECRET="your-secret" \
+  queueless
+```
+
+The Dockerfile uses:
+- Multi-stage build (dependencies -> build -> production)
+- Non-root user (`nextjs`)
+- Health check (`curl http://localhost:3000/api/health`)
+- Standalone output for minimal image size
+
+### Environment Setup for Production
+
+1. Set `NODE_ENV=production`
+2. Configure a production PostgreSQL database
+3. Generate a strong `BETTER_AUTH_SECRET`
+4. Set up Razorpay/Stripe with live keys
+5. Configure Resend for transactional emails
+6. Set `NEXT_PUBLIC_APP_URL` to your production domain
 
 ---
 
 ## Environment Variables
 
-See [`.env.example`](.env.example) for all variables.
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_APP_URL` | Yes | Application URL |
-| `DATABASE_URL` | Phase 2+ | PostgreSQL connection string |
-| `BETTER_AUTH_SECRET` | Phase 3+ | Auth session secret |
-| `RESEND_API_KEY` | Phase 6+ | Email service API key |
-| `RAZORPAY_KEY_ID` | Phase 7+ | Payment gateway key |
-| `DEFAULT_COMMISSION_RATE_PERCENT` | Phase 7+ | Default commission (e.g., 10) |
-| `DEFAULT_CURRENCY` | Phase 7+ | Currency code (e.g., INR) |
+| Variable                         | Required | Default        | Description                              |
+| -------------------------------- | -------- | -------------- | ---------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`            | Yes      | localhost:3000  | Application URL                          |
+| `NODE_ENV`                       | Yes      | development    | Environment mode                         |
+| `DATABASE_URL`                   | Yes      | -              | PostgreSQL connection string             |
+| `BETTER_AUTH_SECRET`             | Yes      | -              | Auth session encryption secret           |
+| `BETTER_AUTH_URL`                | Yes      | -              | Auth callback URL                        |
+| `RESEND_API_KEY`                 | No       | -              | Resend email service API key             |
+| `EMAIL_FROM`                     | No       | -              | From email address                       |
+| `PAYMENT_PROVIDER`               | No       | razorpay       | Payment gateway (razorpay or stripe)     |
+| `RAZORPAY_KEY_ID`                | No       | -              | Razorpay API key ID                      |
+| `RAZORPAY_KEY_SECRET`            | No       | -              | Razorpay API key secret                  |
+| `RAZORPAY_WEBHOOK_SECRET`        | No       | -              | Razorpay webhook signature secret        |
+| `DEFAULT_COMMISSION_RATE_PERCENT`| No       | 10             | Default commission percentage            |
+| `DEFAULT_CURRENCY`               | No       | INR            | Default currency code                    |
+| `MAX_FILE_SIZE_MB`               | No       | 5              | Max file upload size                     |
+| `ALLOWED_IMAGE_TYPES`            | No       | image/jpeg,... | Allowed image MIME types                 |
 
 ---
 
-## Available Scripts
+## Troubleshooting
+
+### Build Error: Route segment config is not compatible with cacheComponents
+
+**Cause**: Next.js 16 with `cacheComponents: true` does not allow `export const dynamic` or `export const runtime` in route files.
+
+**Solution**: Already fixed. Cache-Control headers are used instead of route segment configs.
+
+### Build Warning: middleware file convention is deprecated
+
+**Cause**: Next.js 16 has deprecated the `middleware.ts` convention in favor of `proxy.ts`.
+
+**Solution**: Run `npx @next/codemod@canary middleware-to-proxy .` to auto-migrate, or keep using middleware (it still works with a deprecation warning).
+
+### Invalid email or password when logging in with demo accounts
+
+**Cause**: The database has not been seeded, or the seed used placeholder password hashes.
+
+**Solution**: Run `npm run db:seed` with the updated seed file that contains proper SHA-256 hashes matching the auth service.
+
+### Database connection error
+
+**Cause**: `DATABASE_URL` not set or PostgreSQL not running.
+
+**Solution**: Check `.env.local` has a valid `DATABASE_URL`. Ensure PostgreSQL is running and accessible.
+
+### Prisma schema out of sync
 
 ```bash
-npm run dev              # Start development server
-npm run build            # Production build
-npm run start            # Start production server
-npm run lint             # ESLint
-npm run test             # Run unit tests (Vitest)
-npm run test:watch       # Run tests in watch mode
-npm run test:coverage    # Run tests with coverage report
-npm run test:e2e         # Run E2E tests (Playwright)
-npm run test:e2e:ui      # Run E2E tests with UI
-npm run test:e2e:install # Install Playwright browsers
+npm run db:generate  # Regenerate Prisma client
+npm run db:push      # Push schema changes to DB
 ```
 
----
+### TypeScript Type Errors with unknown as ReactNode
 
-## Commission Model
+**Cause**: React 19 strict mode rejects `unknown` typed values as JSX children.
 
-QueueLess uses a configurable commission model:
-
-| Item | Example |
-|------|---------|
-| Booking amount | ₹1,000 |
-| Commission rate | 10% (configurable) |
-| Platform commission | ₹100 |
-| Shop owner gross share | ₹900 |
-| Gateway fees & taxes | Deducted separately |
-
-- Rates are captured as immutable snapshots at booking time
-- All money stored as integer minor currency units (paise)
-- Historical records are never retroactively modified
-- Refunds create new ledger entries rather than editing existing ones
+**Solution**: Use `String()` wrapper to explicitly convert unknown values, or use `=== true` for boolean checks in JSX conditionals.
 
 ---
 
-## Role & Permission Matrix
+## Validation Schemas Reference
 
-| Action | Customer | Shop Owner | Admin |
-|--------|----------|------------|-------|
-| Browse businesses | ✅ | ✅ | ✅ |
-| Book appointments | ✅ | ❌ | ❌ |
-| Join walk-in queue | ✅ | ❌ | ❌ |
-| Submit reviews | ✅ | ❌ | ❌ |
-| Create business listing | ❌ | ✅ | ✅ |
-| Manage own business | ❌ | ✅ | ❌ |
-| Manage queue | ❌ | ✅ | ❌ |
-| View own earnings | ❌ | ✅ | ❌ |
-| Verify businesses | ❌ | ❌ | ✅ |
-| Moderate reviews | ❌ | ❌ | ✅ |
-| Configure commission | ❌ | ❌ | ✅ |
-| View audit logs | ❌ | ❌ | ✅ |
+All Zod schemas are defined in `src/lib/validations.ts`.
 
----
-
-## Security Considerations
-
-- Server-side authentication and authorization on all protected routes
-- Input validation with Zod on both client and server
-- Database credentials never exposed to client bundles
-- Webhook signature verification for payment events
-- Idempotent payment and booking operations
-- Audit logging for privileged actions
-- No raw card details stored
-- Error responses don't leak stack traces or secrets
-- Rate limiting on authentication and booking endpoints
-- CSRF protection via session cookie configuration
+| Schema                     | Fields                                           |
+| -------------------------- | ------------------------------------------------ |
+| `registerSchema`           | email, password (8+), name, phone?, role          |
+| `loginSchema`              | email, password                                   |
+| `createBusinessSchema`     | name, address, city, state, pincode, categoryId, ... |
+| `updateBusinessSchema`     | All createBusiness fields (partial)                |
+| `createServiceSchema`      | name, durationMinutes, priceAmount, currency       |
+| `businessHoursSchema`      | dayOfWeek, openTime, closeTime, breaks, isClosed   |
+| `createAppointmentSchema`  | businessId, serviceId, date, startTime, notes?     |
+| `joinQueueSchema`          | businessId, serviceId                              |
+| `createReviewSchema`       | businessId, bookingId, bookingType, rating, comment?|
+| `createCommissionPolicySchema` | name, ratePercent, minAmount?, maxAmount?       |
+| `searchBusinessesSchema`   | q?, category?, city?, page, limit, sortBy          |
+| `paginationSchema`         | page, limit                                        |
 
 ---
 
-## Known Limitations
-
-- Rate limiting uses in-memory store (single-instance only; use Redis for multi-instance)
-- Real-time queue updates require Supabase Realtime configuration
-- Payment gateway requires live Razorpay/Stripe keys for actual transactions
-- Email notifications require Resend API key configuration
-- Geolocation integration is UI-only (no GPS/IP-based detection)
-- Demo queue preview on homepage uses simulated data
-
----
-
-## Roadmap
-
-1. ~~**Phase 0–1**: Homepage & static pages~~ ✅
-2. ~~**Phase 2**: Database schema and Prisma setup~~ ✅
-3. ~~**Phase 3**: Authentication and role-based access control~~ ✅
-4. ~~**Phase 4**: Business listings with search and filtering~~ ✅
-5. ~~**Phase 5**: Booking engine and virtual queue system~~ ✅
-6. ~~**Phase 6**: Realtime updates and notifications~~ ✅
-7. ~~**Phase 7**: Commission system and payment integration~~ ✅
-8. ~~**Phase 8**: Admin and owner dashboards~~ ✅
-9. ~~**Phase 9**: Testing, security audit, and deployment~~ ✅
-
-### Future Enhancements
-
-- Redis-based rate limiting for horizontal scaling
-- SMS notifications via Twilio
-- Mobile app (React Native / Flutter)
-- Analytics dashboard with charts
-- Multi-language support (i18n)
-- AI-powered queue wait time prediction
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Please ensure all code passes `npm run lint` and `npm run build` before submitting.
-
----
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-#   q u e u e l e s s  
- 
+*Last updated: October 2026 | QueueLess v0.1.0*
