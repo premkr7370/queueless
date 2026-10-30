@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+
+# Testing
+coverage
+e2e
+playwright-report
+test-results
+
+# IDE & OS files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Env files (except example)
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+LICENSE
+
+# Config files not needed at runtime
+vitest.config.ts
+playwright.config.ts
+tsconfig.tsbuildinfo
+.eslintrc*
+eslint.config.mjs
+components.json
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml

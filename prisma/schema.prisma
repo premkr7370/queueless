@@ -1,0 +1,448 @@
+// ============================================================
+// QueueLess — Prisma Schema
+// ============================================================
+// PostgreSQL database schema for the QueueLess marketplace.
+// Money is stored as integer minor currency units (paise for INR).
+// All timestamps use UTC.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// ENUMS
+// ──────────────────────────────────────────────
+
+enum UserRole {
+  CUSTOMER
+  SHOP_OWNER
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MembershipRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum QueueTicketStatus {
+  WAITING
+  CALLED
+  SERVING
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  CAPTURED
+  REFUNDED
+  FAILED
+}
+
+enum LedgerEntryType {
+  COMMISSION
+  REFUND_ADJUSTMENT
+}
+
+enum NotificationType {
+  QUEUE_UPDATE
+  APPOINTMENT_REMINDER
+  BOOKING_CONFIRMATION
+  BOOKING_CANCELLATION
+  SYSTEM
+}
+
+// ──────────────────────────────────────────────
+// CORE ENTITIES
+// ──────────────────────────────────────────────
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  phone          String?
+  passwordHash   String
+  role           UserRole @default(CUSTOMER)
+  emailVerified  Boolean  @default(false)
+  avatarUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  memberships    BusinessMembership[]
+  appointments   Appointment[]        @relation("CustomerAppointments")
+  staffBookings  Appointment[]        @relation("StaffAppointments")
+  queueTickets   QueueTicket[]
+  reviews        Review[]
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  sessions       Session[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+// ──────────────────────────────────────────────
+// BUSINESS ENTITIES
+// ──────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  icon        String   // Lucide icon name
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  businesses Business[]
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Business {
+  id                 String             @id @default(cuid())
+  slug               String             @unique
+  name               String
+  description        String?
+  address            String
+  city               String
+  state              String
+  pincode            String
+  phone              String?
+  email              String?
+  website            String?
+  timezone           String             @default("Asia/Kolkata")
+  categoryId         String
+  verificationStatus VerificationStatus @default(PENDING)
+  verificationNote   String?
+  logoUrl            String?
+  coverImageUrl      String?
+  isActive           Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  // Relations
+  category       Category             @relation(fields: [categoryId], references: [id])
+  memberships    BusinessMembership[]
+  services       Service[]
+  businessHours  BusinessHours[]
+  appointments   Appointment[]
+  queueCounters  QueueCounter[]
+  queueTickets   QueueTicket[]
+  reviews        Review[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([city])
+  @@index([verificationStatus])
+  @@map("businesses")
+}
+
+model BusinessMembership {
+  id         String         @id @default(cuid())
+  userId     String
+  businessId String
+  role       MembershipRole @default(OWNER)
+  createdAt  DateTime       @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([userId])
+  @@index([businessId])
+  @@map("business_memberships")
+}
+
+// ──────────────────────────────────────────────
+// SERVICES & HOURS
+// ──────────────────────────────────────────────
+
+model Service {
+  id              String   @id @default(cuid())
+  businessId      String
+  name            String
+  description     String?
+  durationMinutes Int
+  priceAmount     Int      // minor currency units (paise)
+  currency        String   @default("INR")
+  isActive        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  queueTickets QueueTicket[]
+
+  @@index([businessId])
+  @@map("services")
+}
+
+model BusinessHours {
+  id             String  @id @default(cuid())
+  businessId     String
+  dayOfWeek      Int     // 0 = Sunday, 6 = Saturday
+  openTime       String  // HH:mm format
+  closeTime      String  // HH:mm format
+  breakStartTime String? // HH:mm format
+  breakEndTime   String? // HH:mm format
+  isClosed       Boolean @default(false)
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, dayOfWeek])
+  @@index([businessId])
+  @@map("business_hours")
+}
+
+// ──────────────────────────────────────────────
+// APPOINTMENTS
+// ──────────────────────────────────────────────
+
+model Appointment {
+  id         String            @id @default(cuid())
+  businessId String
+  serviceId  String
+  customerId String
+  staffId    String?
+  date       DateTime          @db.Date
+  startTime  String            // HH:mm
+  endTime    String            // HH:mm
+  status     AppointmentStatus @default(CONFIRMED)
+  notes      String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  business Business        @relation(fields: [businessId], references: [id])
+  service  Service         @relation(fields: [serviceId], references: [id])
+  customer User            @relation("CustomerAppointments", fields: [customerId], references: [id])
+  staff    User?           @relation("StaffAppointments", fields: [staffId], references: [id])
+  payment  BookingPayment? @relation("AppointmentPayment")
+
+  @@index([businessId, date, status])
+  @@index([customerId])
+  @@index([staffId])
+  @@map("appointments")
+}
+
+// ──────────────────────────────────────────────
+// QUEUE SYSTEM
+// ──────────────────────────────────────────────
+
+model QueueCounter {
+  id              String   @id @default(cuid())
+  businessId      String
+  date            DateTime @db.Date
+  lastTokenNumber Int      @default(0)
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@unique([businessId, date])
+  @@index([businessId])
+  @@map("queue_counters")
+}
+
+model QueueTicket {
+  id                  String            @id @default(cuid())
+  businessId          String
+  serviceId           String
+  customerId          String
+  tokenNumber         Int
+  date                DateTime          @db.Date
+  status              QueueTicketStatus @default(WAITING)
+  estimatedWaitMinutes Int?
+  calledAt            DateTime?
+  servingStartedAt    DateTime?
+  completedAt         DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  business Business        @relation(fields: [businessId], references: [id])
+  service  Service         @relation(fields: [serviceId], references: [id])
+  customer User            @relation(fields: [customerId], references: [id])
+  payment  BookingPayment? @relation("QueueTicketPayment")
+
+  @@unique([businessId, date, tokenNumber])
+  @@index([businessId, date, status])
+  @@index([customerId])
+  @@map("queue_tickets")
+}
+
+// ──────────────────────────────────────────────
+// PAYMENTS & COMMISSION
+// ──────────────────────────────────────────────
+
+model CommissionPolicy {
+  id             String   @id @default(cuid())
+  name           String
+  ratePercent    Decimal  @db.Decimal(5, 2) // e.g. 10.00
+  minAmountPaise Int?     // minimum commission in paise
+  maxAmountPaise Int?     // maximum commission in paise
+  isActive       Boolean  @default(true)
+  effectiveFrom  DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@index([isActive])
+  @@map("commission_policies")
+}
+
+model BookingPayment {
+  id                     String        @id @default(cuid())
+  appointmentId          String?       @unique
+  queueTicketId          String?       @unique
+  grossAmountPaise       Int           // total service amount in paise
+  currency               String        @default("INR")
+  commissionRateSnapshot Decimal       @db.Decimal(5, 2) // rate at booking time
+  commissionAmountPaise  Int           // platform commission in paise
+  ownerSharePaise        Int           // owner's share in paise
+  paymentStatus          PaymentStatus @default(PENDING)
+  providerOrderId        String?       // Razorpay order_id / Stripe payment_intent
+  providerPaymentId      String?       // Razorpay payment_id / Stripe charge_id
+  paidAt                 DateTime?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  appointment    Appointment?          @relation("AppointmentPayment", fields: [appointmentId], references: [id])
+  queueTicket    QueueTicket?          @relation("QueueTicketPayment", fields: [queueTicketId], references: [id])
+  ledgerEntries  CommissionLedgerEntry[]
+
+  @@index([paymentStatus])
+  @@index([providerOrderId])
+  @@map("booking_payments")
+}
+
+model CommissionLedgerEntry {
+  id               String          @id @default(cuid())
+  bookingPaymentId String
+  type             LedgerEntryType
+  amountPaise      Int             // can be negative for refund adjustments
+  description      String
+  createdAt        DateTime        @default(now())
+
+  bookingPayment BookingPayment @relation(fields: [bookingPaymentId], references: [id])
+
+  @@index([bookingPaymentId])
+  @@map("commission_ledger_entries")
+}
+
+// ──────────────────────────────────────────────
+// REVIEWS
+// ──────────────────────────────────────────────
+
+model Review {
+  id          String   @id @default(cuid())
+  businessId  String
+  customerId  String
+  bookingId   String   // polymorphic: appointmentId or queueTicketId
+  bookingType String   // "APPOINTMENT" or "QUEUE_TICKET"
+  rating      Int      // 1-5
+  comment     String?
+  isModerated Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id])
+  customer User     @relation(fields: [customerId], references: [id])
+
+  @@unique([customerId, bookingId]) // one review per booking
+  @@index([businessId])
+  @@index([customerId])
+  @@map("reviews")
+}
+
+// ──────────────────────────────────────────────
+// NOTIFICATIONS
+// ──────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  isRead    Boolean          @default(false)
+  metadata  Json?            // flexible payload
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ──────────────────────────────────────────────
+// AUDIT LOG
+// ──────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  entityType String
+  entityId   String
+  details    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+// ──────────────────────────────────────────────
+// WEBHOOK EVENTS (idempotency)
+// ──────────────────────────────────────────────
+
+model WebhookEvent {
+  id            String   @id @default(cuid())
+  provider      String   // "razorpay" | "stripe"
+  eventId       String   @unique // provider's event ID for dedup
+  eventType     String
+  payload       Json
+  processedAt   DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([eventId])
+  @@map("webhook_events")
+}
